@@ -151,10 +151,10 @@ def count(table_name, where_cols, what_to_find):
     query += where_build(where_cols)
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
 
 
-def select_recent_game(game):
+def select_recent_game(game, offset=None):
     query = "SELECT * FROM "
     query += "(SELECT base_post.*, COUNT(base_like.id) AS likes "
     query += "FROM base_post "
@@ -163,12 +163,14 @@ def select_recent_game(game):
     query += "GROUP BY base_post.Id "
     query += ") AS p "
     query += "ORDER BY p.likes DESC "
+    if offset:
+        query += add_offset(offset)
     with connection.cursor() as cursor:
         cursor.execute(query, params={"game": game})
         return cursor.fetchall()
 
 
-def select_recent():
+def select_recent(offset=None):
     query = "SELECT * FROM "
     query += "(SELECT base_post.*, COUNT(base_like.id) AS likes "
     query += "FROM base_post "
@@ -177,6 +179,8 @@ def select_recent():
     query += "GROUP BY base_post.Id "
     query += ") AS p "
     query += "ORDER BY p.likes DESC "
+    if offset is not None:
+        query += add_offset(offset)
     with connection.cursor() as cursor:
         cursor.execute(query)
         return cursor.fetchall()

@@ -107,8 +107,8 @@ class LikeSerializer(serializers.Serializer):
 class CommentSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'ResponseId': obj[0],
-            'PostId': obj[1],
-            'UserName': obj[2],
-            'Content': obj[3],
+            'CommentId': obj[0],
+            'Content': obj[1],
+            'PostId': obj[2],
+            'UserName': obj[3],
         }

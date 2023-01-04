@@ -58,3 +58,6 @@ def spec_comment(request, post_id, comment_id):
     return Response()
 
 
+@api_view(['GET'])
+def comment_amounts(request, post_id):
+    return Response(Queries.count(settings.COMMENT_TABLE, ['PostId_id'], [post_id]))

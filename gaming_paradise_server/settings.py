@@ -27,15 +27,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 
-POST_TABLE = 'base_post'
-GAME_TABLE = 'base_game'
-USER_TABLE = 'base_user'
-COMMENT_TABLE = 'base_comment'
-GENRE_TABLE = 'base_genre'
-LIKE_TABLE = 'base_like'
-PLATFORM_TABLE = 'base_platform'
-REVIEW_TABLE = 'base_review'
-USER_GAMES_TABLE = 'base_usergames'
+POST_TABLE = 'post'
+GAME_TABLE = 'game'
+USER_TABLE = 'user'
+COMMENT_TABLE = 'comment'
+GENRE_TABLE = 'genre'
+LIKE_TABLE = 'like'
+PLATFORM_TABLE = 'platform'
+REVIEW_TABLE = 'review'
+USER_GAMES_TABLE = 'usergames'
 
 
 # Application definition

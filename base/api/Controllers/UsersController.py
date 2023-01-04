@@ -9,7 +9,6 @@ def login(request):
     # Check if the user exists and if the password is correct
     # with connection.cursor() as cursor:
     #     cursor.execute("SELECT * FROM base_user WHERE UserName = %s AND Password = %s", [username, password])
-    x = settings.USER_TABLE
     if not Queries.select_spec(settings.USER_TABLE, ['UserName', 'Password'], [username, password]):
         return Response("User doesn't exist or password is wrong", status=status.HTTP_404_NOT_FOUND)
 
