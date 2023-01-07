@@ -154,33 +154,35 @@ def count(table_name, where_cols, what_to_find):
         return cursor.fetchone()[0]
 
 
-def select_recent_game(game, offset=None):
-    query = "SELECT * FROM "
-    query += "(SELECT base_post.*, COUNT(base_like.id) AS likes "
-    query += "FROM base_post "
-    query += "LEFT JOIN base_like ON base_like.PostId_id = base_post.Id "
-    query += "WHERE base_post.TimestampCreated >= NOW() - INTERVAL 1 DAY AND base_post.GameName_id = %(game)s "
-    query += "GROUP BY base_post.Id "
-    query += ") AS p "
-    query += "ORDER BY p.likes DESC "
-    if offset:
-        query += add_offset(offset)
-    with connection.cursor() as cursor:
-        cursor.execute(query, params={"game": game})
-        return cursor.fetchall()
-
-
-def select_recent(offset=None):
+def popular_sort_build(where_cols=None, offset=None):
     query = "SELECT * FROM "
     query += "(SELECT base_post.*, COUNT(base_like.id) AS likes "
     query += "FROM base_post "
     query += "LEFT JOIN base_like ON base_like.PostId_id = base_post.Id "
     query += "WHERE base_post.TimestampCreated >= NOW() - INTERVAL 1 DAY "
+    for col in where_cols:
+        query += "AND {}".format(where_cols)
+        query += " = %({)".format(where_cols)
+        query += ")s "
     query += "GROUP BY base_post.Id "
     query += ") AS p "
     query += "ORDER BY p.likes DESC "
-    if offset is not None:
+    if offset:
         query += add_offset(offset)
+    return query
+
+
+
+def select_recent_game(game, offset=None):
+    game_col = "base_post.GameName_id"
+    query = popular_sort_build([game_col], offset=offset)
+    with connection.cursor() as cursor:
+        cursor.execute(query, params={game_col: game})
+        return cursor.fetchall()
+
+
+def select_recent(offset=None):
+    query = popular_sort_build(offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query)
         return cursor.fetchall()
