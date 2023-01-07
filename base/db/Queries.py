@@ -155,18 +155,20 @@ def count(table_name, where_cols, what_to_find):
 
 
 def popular_sort_build(where_cols=None, offset=None):
+    if where_cols is None:
+        where_cols = []
     query = "SELECT * FROM "
-    query += "(SELECT base_post.*, COUNT(base_like.id) AS likes "
-    query += "FROM base_post "
-    query += "LEFT JOIN base_like ON base_like.PostId_id = base_post.Id "
-    query += "WHERE base_post.TimestampCreated >= NOW() - INTERVAL 1 DAY "
+    query += "(SELECT post.*, COUNT(likes.id) AS post_likes "
+    query += "FROM post "
+    query += "LEFT JOIN likes ON likes.PostId_id = post.Id "
+    query += "WHERE post.TimestampCreated >= NOW() - INTERVAL 1 DAY "
     for col in where_cols:
         query += "AND {}".format(where_cols)
         query += " = %({)".format(where_cols)
         query += ")s "
-    query += "GROUP BY base_post.Id "
+    query += "GROUP BY post.Id "
     query += ") AS p "
-    query += "ORDER BY p.likes DESC "
+    query += "ORDER BY p.post_likes DESC "
     if offset:
         query += add_offset(offset)
     return query
@@ -174,7 +176,7 @@ def popular_sort_build(where_cols=None, offset=None):
 
 
 def select_recent_game(game, offset=None):
-    game_col = "base_post.GameName_id"
+    game_col = "post.GameName_id"
     query = popular_sort_build([game_col], offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query, params={game_col: game})
