@@ -99,6 +99,7 @@ DATABASES = {
         'PASSWORD': 'SantIdOfek',
         'HOST':'127.0.0.1',
         'PORT':'3306',
+        'POOL_SIZE': 7
     }
 }
 

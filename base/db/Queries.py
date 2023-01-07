@@ -163,8 +163,8 @@ def popular_sort_build(where_cols=None, offset=None):
     query += "LEFT JOIN likes ON likes.PostId_id = post.Id "
     query += "WHERE post.TimestampCreated >= NOW() - INTERVAL 1 DAY "
     for col in where_cols:
-        query += "AND {}".format(where_cols)
-        query += " = %({)".format(where_cols)
+        query += "AND {}".format(col)
+        query += " = %({)".format(col)
         query += ")s "
     query += "GROUP BY post.Id "
     query += ") AS p "
@@ -188,3 +188,7 @@ def select_recent(offset=None):
     with connection.cursor() as cursor:
         cursor.execute(query)
         return cursor.fetchall()
+
+
+# def select_recent_user(user_name, offset=None):
+
