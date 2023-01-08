@@ -13,8 +13,6 @@ def get_game(request, game_name):
     game_genres = Queries.select_spec_join(settings.GAME_TABLE, settings.GENRE_TABLE, game_col, 'GameName_id'
                                            , [game_col], [game_name])
     # If no game was found, raise a 404 error
-    if not game_genres:
-        return Response(status=status.HTTP_404_NOT_FOUND)
     for game_genre in game_genres:
         genres.append(game_genre[8])
     game_platforms = Queries.select_spec_join(settings.GAME_TABLE, settings.PLATFORM_TABLE, game_col, 'GameName_id'
