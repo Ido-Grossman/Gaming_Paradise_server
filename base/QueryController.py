@@ -22,13 +22,15 @@ class QueryController:
 
     def get_genres(self):
         if not self.genres:
-            self.genres = Queries.select_all('base_genre', special='DISTINCT', spec_col=['Genre'])
+            rows = Queries.select_all(settings.GENRE_TABLE, special='DISTINCT', spec_col=['Genre'])
+            self.genres = {"Genre" : [row[0] for row in rows]}
         return self.genres
 
 
     def get_platforms(self):
         if not self.platforms:
-            self.platforms = Queries.select_all('base_platform', special='DISTINCT', spec_col=['Platform'])
+            rows = Queries.select_all(settings.PLATFORM_TABLE, special='DISTINCT', spec_col=['Platform'])
+            self.platforms = {"Platform" : [row[0] for row in rows]}
         return self.platforms
 
     def __init__(self):

@@ -7,7 +7,7 @@ def get_game(request, game_name):
     """
     Handles GET requests for a single game.
     """
-    game_table, game_col = 'base_game', 'Name'
+    game_col = 'Name'
     genres, platforms = [], []
     # Use a raw SQL query to retrieve the requested game
     game_genres = Queries.select_spec_join(settings.GAME_TABLE, settings.GENRE_TABLE, game_col, 'GameName_id'

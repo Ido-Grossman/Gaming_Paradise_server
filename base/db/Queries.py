@@ -154,17 +154,19 @@ def count(table_name, where_cols, what_to_find):
         return cursor.fetchone()[0]
 
 
-def popular_sort_build(where_cols=None, offset=None):
+def popular_sort_build(where_cols=None, offset=None, user=None):
     if where_cols is None:
         where_cols = []
     query = "SELECT * FROM "
     query += "(SELECT post.*, COUNT(likes.id) AS post_likes "
     query += "FROM post "
+    if user:
+        query += "INNER JOIN usergames ug ON ug.GameName_id = post.GameName_id AND ug.UserName_id = %s "
     query += "LEFT JOIN likes ON likes.PostId_id = post.Id "
     query += "WHERE post.TimestampCreated >= NOW() - INTERVAL 1 DAY "
     for col in where_cols:
         query += "AND {}".format(col)
-        query += " = %({)".format(col)
+        query += " = %({}".format(col)
         query += ")s "
     query += "GROUP BY post.Id "
     query += ") AS p "
@@ -190,5 +192,8 @@ def select_recent(offset=None):
         return cursor.fetchall()
 
 
-# def select_recent_user(user_name, offset=None):
-
+def select_recent_user(user_name, offset=None):
+    query = popular_sort_build(offset=offset, user=user_name)
+    with connection.cursor() as cursor:
+        cursor.execute(query, [user_name])
+        return cursor.fetchall()

@@ -90,3 +90,19 @@ def popular_posts(request):
     posts = Queries.select_recent(offset=offset)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def popular_game_posts(request, game_name):
+    offset = int(request.GET.get('offset', 0))
+    posts = Queries.select_recent_game(game_name, offset=offset)
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def popular_user_posts(request, user_name):
+    offset = int(request.GET.get('offset', 0))
+    posts = Queries.select_recent_user(user_name, offset=offset)
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
