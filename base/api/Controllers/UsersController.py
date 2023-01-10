@@ -43,7 +43,7 @@ def user_games(request, pk):
         game = Queries.select_spec(settings.GAME_TABLE, ['Name'], [game_name])
         if not game:
             return Response("Game doesn't exist", status=status.HTTP_404_NOT_FOUND)
-        columns, values = ['UserName_id', 'GameName_id'], [user[0], game[0]]
+        columns, values = ['UserName_id', 'GameName_id'], [user[0][0], game[0][0]]
         if Queries.select_spec(settings.USER_GAMES_TABLE, columns, values):
             # If the user already subscribed to the game, remove it from him
             Queries.delete(settings.USER_GAMES_TABLE, columns, values)
