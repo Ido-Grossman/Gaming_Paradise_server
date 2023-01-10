@@ -6,7 +6,7 @@ urlpatterns = [
     path('login/', UsersController.login),
     path('register/', UsersController.register),
     path('users/<str:pk>/games/', UsersController.user_games),
-    # path('users/contacts/', UsersController.add_contact),
+    path('users/<str:user_name>/games/<str:game_name>', UsersController.user_games),
     path('games/<str:game_name>/', GamesController.get_game),
     path('games/', GamesController.get_games),
     path('games/<str:game_name>/reviews', GamesController.get_game_reviews),

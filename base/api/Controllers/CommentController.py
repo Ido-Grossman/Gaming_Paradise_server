@@ -47,13 +47,9 @@ def spec_comment(request, post_id, comment_id):
         if comment_user != request.data['UserName']:
             return Response("You aren't allowed to edit this comment.", status=status.HTTP_400_BAD_REQUEST)
         # If the method is PUT, update the comment in the database
-        # with connection.cursor() as cursor:
-        #     cursor.execute("UPDATE base_comment SET Content = %s WHERE CommentId = %s AND PostId_id = %s", [request.data['Content'], comment_id, post_id])
         Queries.update(settings.COMMENT_TABLE, ['Content'], [request.data['Content']], columns, values)
     else:
         # If the method is DELETE, delete the comment from the database
-        # with connection.cursor() as cursor:
-        #     cursor.execute("DELETE FROM base_comment WHERE CommentId = %s AND PostId_id = %s", [comment_id, post_id])
         Queries.delete(settings.COMMENT_TABLE, columns, values)
     return Response()
 

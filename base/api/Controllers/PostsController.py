@@ -67,8 +67,7 @@ def create_post(request):
         # If the game doesn't exist, return 404 not found
         return Response("Game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
 
-# Insert the post into the database
-#     cursor.execute("INSERT INTO base_post (Content, Title, UserName_id, GameName_id, TimestampCreated) VALUES (%s, %s, %s, %s, NOW())", [content, title, user_name, game_name])
+    # Insert the post into the database
     columns = ['Content', 'Title', 'UserName_id', 'GameName_id', 'TimestampCreated']
     values = [content, title, user_name, game_name]
     Queries.insert(settings.POST_TABLE, columns, values)
@@ -87,7 +86,10 @@ def create_post(request):
 @api_view(['GET'])
 def popular_posts(request):
     offset = int(request.GET.get('offset', 0))
-    posts = Queries.select_recent(offset=offset)
+    day = int(request.GET.get('day', 0))
+    posts = Queries.select_recent(day, offset=offset)
+    if len(posts) == 0:
+        return Response(status=status.HTTP_204_NO_CONTENT)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
@@ -95,7 +97,8 @@ def popular_posts(request):
 @api_view(['GET'])
 def popular_game_posts(request, game_name):
     offset = int(request.GET.get('offset', 0))
-    posts = Queries.select_recent_game(game_name, offset=offset)
+    day = int(request.GET.get('day', 0))
+    posts = Queries.select_recent_game(day, game_name, offset=offset)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
@@ -103,6 +106,7 @@ def popular_game_posts(request, game_name):
 @api_view(['GET'])
 def popular_user_posts(request, user_name):
     offset = int(request.GET.get('offset', 0))
-    posts = Queries.select_recent_user(user_name, offset=offset)
+    day = int(request.GET.get('day', 0))
+    posts = Queries.select_recent_user(user_name, day, offset=offset)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)

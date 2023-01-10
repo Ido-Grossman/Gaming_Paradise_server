@@ -154,7 +154,7 @@ def count(table_name, where_cols, what_to_find):
         return cursor.fetchone()[0]
 
 
-def popular_sort_build(where_cols=None, offset=None, user=None):
+def popular_sort_build(day, where_cols=None, offset=None, user=None):
     if where_cols is None:
         where_cols = []
     query = "SELECT * FROM "
@@ -163,7 +163,10 @@ def popular_sort_build(where_cols=None, offset=None, user=None):
     if user:
         query += "INNER JOIN usergames ug ON ug.GameName_id = post.GameName_id AND ug.UserName_id = %s "
     query += "LEFT JOIN likes ON likes.PostId_id = post.Id "
-    query += "WHERE post.TimestampCreated >= NOW() - INTERVAL 1 DAY "
+    query += "WHERE post.TimestampCreated >= NOW() "
+    query += "- INTERVAL {} DAY ".format(day + 1)
+    query += "AND post.TimestampCreated < NOW() "
+    query += "- INTERVAL {} DAY ".format(day)
     for col in where_cols:
         query += "AND {}".format(col)
         query += " = %({}".format(col)
@@ -171,29 +174,29 @@ def popular_sort_build(where_cols=None, offset=None, user=None):
     query += "GROUP BY post.Id "
     query += ") AS p "
     query += "ORDER BY p.post_likes DESC "
-    if offset:
+    if offset is not None:
         query += add_offset(offset)
     return query
 
 
 
-def select_recent_game(game, offset=None):
+def select_recent_game(day, game, offset=None):
     game_col = "post.GameName_id"
-    query = popular_sort_build([game_col], offset=offset)
+    query = popular_sort_build(day, where_cols=[game_col], offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query, params={game_col: game})
         return cursor.fetchall()
 
 
-def select_recent(offset=None):
-    query = popular_sort_build(offset=offset)
+def select_recent(day, offset=None):
+    query = popular_sort_build(day, offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query)
         return cursor.fetchall()
 
 
-def select_recent_user(user_name, offset=None):
-    query = popular_sort_build(offset=offset, user=user_name)
+def select_recent_user(user_name, day, offset=None):
+    query = popular_sort_build(day, offset=offset, user=user_name)
     with connection.cursor() as cursor:
         cursor.execute(query, [user_name])
         return cursor.fetchall()
