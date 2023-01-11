@@ -11,7 +11,7 @@ class UserSerializer(serializers.Serializer):
 class GameFullSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'ID': obj[0],
+            'id': obj[0],
             'Name': obj[1],
             'ReleaseYear': obj[2],
             'Developer': obj[3],
@@ -27,7 +27,7 @@ class GameFullSerializer(serializers.Serializer):
 class GameSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'ID': obj[0],
+            'id': obj[0],
             'Name': obj[1],
             'ReleaseYear': obj[2],
             'Developer': obj[3],
@@ -73,7 +73,7 @@ class PostSerializer(serializers.Serializer):
 
     def to_representation(self, obj):
         return {
-            'Id': obj[0],
+            'id': obj[0],
             'TimestampCreated': obj[1].strftime('%d/%m/%Y %H:%M:%S'),
             'Content': obj[2],
             'Title': obj[3],
@@ -86,11 +86,10 @@ class PostSerializer(serializers.Serializer):
 class ReviewSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'RecommendationId': obj[0],
+            'id': obj[0],
             'UserName': obj[1],
-            'Review': obj[2],
+            'Content': obj[2],
             'Timestampcreated': obj[3].strftime('%d/%m/%Y %H:%M:%S'),
-            'GameName': obj[4],
         }
 
 class UserGamesSerializer(serializers.Serializer):
@@ -100,17 +99,10 @@ class UserGamesSerializer(serializers.Serializer):
             'UserName': obj[1],
         }
 
-class LikeSerializer(serializers.Serializer):
-    def to_representation(self, obj):
-        return {
-            'PostId': obj[0],
-            'UserName': obj[1],
-        }
-
 class CommentSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'CommentId': obj[0],
+            'id': obj[0],
             'Content': obj[1],
             'TimestampCreated': obj[2].strftime('%d/%m/%Y %H:%M:%S'),
             'PostId': obj[3],
