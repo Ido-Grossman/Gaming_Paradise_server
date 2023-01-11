@@ -1,7 +1,7 @@
 from django.db import connection
 
 
-def build_query(table_name, columns, special=None):
+def build_query(table_name, columns, special=None, exclude=None):
     """
     Build a SELECT query for a given table.
 
@@ -32,6 +32,11 @@ def build_query(table_name, columns, special=None):
         query += " {}".format(columns[size - 1])
         # Add the table name to the query
         query += " FROM {}".format(table_name)
+    if exclude:
+        query += "EXCEPT "
+        for col in exclude:
+            query += "{}, ".format(col)
+        query = query[:-2]
     # Return the constructed query
     return query
 
@@ -55,12 +60,13 @@ def select_all(table_name, special=None, spec_col=None, offset=None):
     Returns:
         list: A list of tuples, where each tuple represents a row in the table.
     """
+
+    # Build the SELECT query using the provided table name and optional special clause and/or specific columns
+    query = build_query(table_name, spec_col, special)
+    if offset:
+        query += add_offset(offset)
+    # Execute the query
     with connection.cursor() as cursor:
-        # Build the SELECT query using the provided table name and optional special clause and/or specific columns
-        query = build_query(table_name, spec_col, special)
-        if offset:
-            query += add_offset(offset)
-        # Execute the query
         cursor.execute(query)
         # Fetch all rows from the query and returns them
         return cursor.fetchall()
@@ -88,22 +94,24 @@ def where_build(where_cols):
 
 
 def select_spec(table_name, where_cols, what_to_find, spec_col=None):
+    query = build_query(table_name, spec_col)
+    query += where_build(where_cols)
     with connection.cursor() as cursor:
-        query = build_query(table_name, spec_col)
-        query += where_build(where_cols)
         cursor.execute(query, what_to_find)
         return cursor.fetchall()
 
 
-def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None):
+def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None, exclude=None):
+    query = build_query(table1, spec_col)
+    query += " INNER JOIN {}".format(table2)
+    query += " ON {}".format(table1)
+    query += ".{}".format(table1_col)
+    query += " = {}".format(table2)
+    query += ".{}".format(table2_col)
+    query += where_build(where_cols)
+    if exclude:
+        query += " EXCEPT {}".format(exclude)
     with connection.cursor() as cursor:
-        query = build_query(table1, spec_col)
-        query += " INNER JOIN {}".format(table2)
-        query += " ON {}".format(table1)
-        query += ".{}".format(table1_col)
-        query += " = {}".format(table2)
-        query += ".{}".format(table2_col)
-        query += where_build(where_cols)
         cursor.execute(query, what_to_find)
         return cursor.fetchall()
 
@@ -157,12 +165,12 @@ def count(table_name, where_cols, what_to_find):
 def popular_sort_build(day, where_cols=None, offset=None, user=None):
     if where_cols is None:
         where_cols = []
-    query = "SELECT * FROM "
+    query = "SELECT p.id, p.TimestampCreated, p.Content, p.Title, game.Name, user.UserName, p.post_likes FROM "
     query += "(SELECT post.*, COUNT(likes.id) AS post_likes "
     query += "FROM post "
     if user:
-        query += "INNER JOIN usergames ug ON ug.GameName_id = post.GameName_id AND ug.UserName_id = %s "
-    query += "LEFT JOIN likes ON likes.PostId_id = post.Id "
+        query += "INNER JOIN usergames ug ON ug.Game_id = post.Game_id AND ug.User_id = %s "
+    query += "LEFT JOIN likes ON likes.Post_id = post.Id "
     query += "WHERE post.TimestampCreated >= NOW() "
     query += "- INTERVAL {} DAY ".format(day + 1)
     query += "AND post.TimestampCreated < NOW() "
@@ -173,6 +181,8 @@ def popular_sort_build(day, where_cols=None, offset=None, user=None):
         query += ")s "
     query += "GROUP BY post.Id "
     query += ") AS p "
+    query += "INNER JOIN game ON game.id = p.Game_id "
+    query += "INNER JOIN user ON user.id = p.User_id "
     query += "ORDER BY p.post_likes DESC "
     if offset is not None:
         query += add_offset(offset)
@@ -181,7 +191,7 @@ def popular_sort_build(day, where_cols=None, offset=None, user=None):
 
 
 def select_recent_game(day, game, offset=None):
-    game_col = "post.GameName_id"
+    game_col = "post.Game_id"
     query = popular_sort_build(day, where_cols=[game_col], offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query, params={game_col: game})

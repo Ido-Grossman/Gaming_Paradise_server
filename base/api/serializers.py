@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import datetime
 
 class UserSerializer(serializers.Serializer):
     def to_representation(self, obj):
@@ -10,28 +11,30 @@ class UserSerializer(serializers.Serializer):
 class GameFullSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'Name': obj[0],
-            'ReleaseYear': obj[1],
-            'Developer': obj[2],
-            'Publisher': obj[3],
-            'MaxPlayers': obj[4],
-            'ESRB': obj[5],
-            'OverView': obj[6],
-            'Genres': obj[7],
-            'Platforms': obj[8],
+            'ID': obj[0],
+            'Name': obj[1],
+            'ReleaseYear': obj[2],
+            'Developer': obj[3],
+            'Publisher': obj[4],
+            'MaxPlayers': obj[5],
+            'ESRB': obj[6],
+            'OverView': obj[7],
+            'Genres': obj[8],
+            'Platforms': obj[9],
         }
 
 
 class GameSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
-            'Name': obj[0],
-            'ReleaseYear': obj[1],
-            'Developer': obj[2],
-            'Publisher': obj[3],
-            'MaxPlayers': obj[4],
-            'ESRB': obj[5],
-            'OverView': obj[6],
+            'ID': obj[0],
+            'Name': obj[1],
+            'ReleaseYear': obj[2],
+            'Developer': obj[3],
+            'Publisher': obj[4],
+            'MaxPlayers': obj[5],
+            'ESRB': obj[6],
+            'OverView': obj[7],
         }
 
 class GameNameSerializer(serializers.Serializer):
@@ -71,7 +74,7 @@ class PostSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
             'Id': obj[0],
-            'TimestampCreated': obj[1],
+            'TimestampCreated': obj[1].strftime('%d/%m/%Y %H:%M:%S'),
             'Content': obj[2],
             'Title': obj[3],
             'GameName': obj[4],
@@ -86,7 +89,7 @@ class ReviewSerializer(serializers.Serializer):
             'RecommendationId': obj[0],
             'UserName': obj[1],
             'Review': obj[2],
-            'Timestampcreated': obj[3],
+            'Timestampcreated': obj[3].strftime('%d/%m/%Y %H:%M:%S'),
             'GameName': obj[4],
         }
 
@@ -109,6 +112,7 @@ class CommentSerializer(serializers.Serializer):
         return {
             'CommentId': obj[0],
             'Content': obj[1],
-            'PostId': obj[2],
-            'UserName': obj[3],
+            'TimestampCreated': obj[2].strftime('%d/%m/%Y %H:%M:%S'),
+            'PostId': obj[3],
+            'UserName': obj[4],
         }

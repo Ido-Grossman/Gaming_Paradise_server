@@ -13,6 +13,6 @@ def get_genres(request):
 @api_view(['GET'])
 def get_genre_games(request, genre):
     # Getting all the games of a specific genre and returns them
-    rows = Queries.select_spec(settings.GENRE_TABLE, ['Genre'], [genre], ['GameName_id'])
-    serializer = GenreGameSerializer(rows, many=True, safe=False)
+    rows = Queries.select_spec(settings.GENRE_TABLE, ['Genre'], [genre], ['Game_id'])
+    serializer = GenreGameSerializer(rows, many=True)
     return Response(serializer.data)
