@@ -87,6 +87,8 @@ def popular_game_posts(request, game_name):
     offset = int(request.GET.get('offset', 0))
     day = int(request.GET.get('day', 0))
     posts = Queries.select_recent_game(day, game_name, offset=offset)
+    if len(posts) == 0:
+        return Response(status=status.HTTP_204_NO_CONTENT)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
@@ -96,5 +98,7 @@ def popular_user_posts(request, user_name):
     offset = int(request.GET.get('offset', 0))
     day = int(request.GET.get('day', 0))
     posts = Queries.select_recent_user(user_name, day, offset=offset)
+    if len(posts) == 0:
+        return Response(status=status.HTTP_204_NO_CONTENT)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
