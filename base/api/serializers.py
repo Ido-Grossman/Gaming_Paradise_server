@@ -89,7 +89,7 @@ class ReviewSerializer(serializers.Serializer):
             'id': obj[0],
             'UserName': obj[1],
             'Content': obj[2],
-            'Timestampcreated': obj[3].strftime('%d/%m/%Y %H:%M:%S'),
+            'TimestampCreated': obj[3].strftime('%d/%m/%Y %H:%M:%S'),
         }
 
 class UserGamesSerializer(serializers.Serializer):

@@ -37,8 +37,8 @@ def user_games(request, pk):
         # If it's get, return all the games of the user.
         # game_ids = Queries.select_spec(settings.USER_GAMES_TABLE, ['User_id'], [pk], spec_col=['Game_id'])
         game_ids = Queries.select_spec_join(settings.USER_GAMES_TABLE, settings.GAME_TABLE, 'Game_id', 'id',
-                                            ['User_id'], [pk])
-        serializer = GameNameSerializer(game_ids, many=True)
+                                            ['User_id'], [pk], spec_col=['game.*'])
+        serializer = GameSerializer(game_ids, many=True)
         return Response(serializer.data)
     else:
         game_id = request.data['Game_id']
