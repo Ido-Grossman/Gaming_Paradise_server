@@ -1,7 +1,7 @@
 from django.db import connection
 
 
-def build_query(table_name, columns, special=None, exclude=None):
+def build_query(table_name, columns, special=None):
     """
     Build a SELECT query for a given table.
 
@@ -32,11 +32,6 @@ def build_query(table_name, columns, special=None, exclude=None):
         query += " {}".format(columns[size - 1])
         # Add the table name to the query
         query += " FROM {}".format(table_name)
-    if exclude:
-        query += "EXCEPT "
-        for col in exclude:
-            query += "{}, ".format(col)
-        query = query[:-2]
     # Return the constructed query
     return query
 
@@ -72,7 +67,9 @@ def select_all(table_name, special=None, spec_col=None, offset=None):
         return cursor.fetchall()
 
 
-def where_build(where_cols):
+def where_build(where_cols, like_cols=None):
+    if not like_cols:
+        like_cols = []
     # Calculate the number of items in the where list
     amount = len(where_cols)
     # Initialize the WHERE clause of the query
@@ -83,25 +80,29 @@ def where_build(where_cols):
         query += " {}".format(where_cols[i])
         # Add a placeholder for the value of the current item
         if where_cols[i] == 'TimestampCreated':
-            query += " = {}".format('NOW()')
+            query += " = {} ".format('NOW()')
+        elif not where_cols[i] in like_cols:
+            query += " = %s "
         else:
-            query += " = %s"
+            query += " LIKE %s "
         # If this is not the last item in the list, add AND
         if i < amount - 1:
-            query += " AND"
+            query += "AND"
     # Return the constructed WHERE clause
     return query
 
 
-def select_spec(table_name, where_cols, what_to_find, spec_col=None):
+def select_spec(table_name, where_cols, what_to_find, spec_col=None, like_cols=None, offset=None):
     query = build_query(table_name, spec_col)
-    query += where_build(where_cols)
+    query += where_build(where_cols, like_cols=like_cols)
+    if offset is not None:
+        query += add_offset(offset)
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
         return cursor.fetchall()
 
 
-def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None, exclude=None):
+def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None, offset=None):
     query = build_query(table1, spec_col)
     query += " INNER JOIN {}".format(table2)
     query += " ON {}".format(table1)
@@ -109,8 +110,8 @@ def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to
     query += " = {}".format(table2)
     query += ".{}".format(table2_col)
     query += where_build(where_cols)
-    if exclude:
-        query += " EXCEPT {}".format(exclude)
+    if offset is not None:
+        query += add_offset(offset)
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
         return cursor.fetchall()

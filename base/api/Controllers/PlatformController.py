@@ -1,17 +1,16 @@
-from ..serializers import PlatformSerializer, PlatformGameSerializer
+from ..serializers import GameSerializer
 from .imports import *
 
 @api_view(['GET'])
 def get_platform(request):
     # Get all the distinct platforms from the platform table and return them
+    platform = request.GET.get('platform', None)
+    if platform:
+        offset = int(request.GET.get('offset', 0))
+        game_ids = Queries.select_spec_join(settings.PLATFORM_TABLE, settings.GAME_TABLE, 'Game_id', 'id', ['Platform'],
+                                            [platform], spec_col=['game.*'], offset=offset)
+        serializer = GameSerializer(game_ids, many=True)
+        return Response(serializer.data)
     controller = QueryController.get_instance()
     platforms = controller.get_platforms()
-    # serializer = PlatformSerializer(platforms, many=True)
     return Response(platforms)
-
-@api_view(['GET'])
-def get_platform_games(request, platform):
-    # Get all the games that are playable on the given platform
-    game_ids = Queries.select_spec('base_platform', ['Platform'], [platform], ['GameName_id'])
-    serializer = PlatformGameSerializer(game_ids, many=True)
-    return Response(serializer.data)

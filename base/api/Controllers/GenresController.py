@@ -1,10 +1,17 @@
-from ..serializers import GenreSerializer, GenreGameSerializer
+from ..serializers import GameSerializer
 from .imports import *
 
 
 @api_view(['GET'])
 def get_genres(request):
     # Get all the distinct genres out of the genres table and returns them.
+    genre = request.GET.get('genre', None)
+    if genre:
+        offset = int(request.GET.get('offset', 0))
+        rows = Queries.select_spec_join(settings.GENRE_TABLE, settings.GAME_TABLE, 'Game_id', 'id', ['Genre'],
+                                        [genre], spec_col=['game.*'], offset=offset)
+        serializer = GameSerializer(rows, many=True)
+        return Response(serializer.data)
     controller = QueryController.get_instance()
     genres = controller.get_genres()
     return Response(genres)
