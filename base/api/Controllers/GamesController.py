@@ -64,6 +64,8 @@ def get_game_reviews(request, game_id):
 
     # Retrieve all reviews for the game
     game_revs = Queries.select_spec(settings.REVIEW_TABLE, ['Game_id'], [game_id], offset=offset)
+    if len(game_revs) == 0:
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     # Serialize the reviews and return them in the response
     serializer = ReviewSerializer(game_revs, many=True)
