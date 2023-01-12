@@ -33,12 +33,14 @@ def get_games(request):
     Handles GET requests for a list of all games.
     """
     offset = int(request.GET.get('offset', 0))
-    game = ['%' + request.GET.get('game', None) + '%']
-    if game:
+    game = [request.GET.get('game', None)]
+    if game[0]:
+        game[0] = '%' + game[0] + '%'
         where = ['Name']
         games = Queries.select_spec(settings.GAME_TABLE, where, [game], like_cols=where, offset=offset)
         serializer = GameSerializer(games, many=True)
         return Response(serializer.data)
+    offset *= 10
     controller = QueryController.get_instance()
     rows = controller.get_games()[offset:offset + 10]
     # Serialize the games and return them in the response

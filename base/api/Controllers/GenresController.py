@@ -5,8 +5,8 @@ from .imports import *
 @api_view(['GET'])
 def get_genres(request):
     # Get all the distinct genres out of the genres table and returns them.
-    genre = request.GET.get('genre', None)
-    if genre:
+    genre = [request.GET.get('genre', None)]
+    if genre[0]:
         offset = int(request.GET.get('offset', 0))
         rows = Queries.select_spec_join(settings.GENRE_TABLE, settings.GAME_TABLE, 'Game_id', 'id', ['Genre'],
                                         [genre], spec_col=['game.*'], offset=offset)
