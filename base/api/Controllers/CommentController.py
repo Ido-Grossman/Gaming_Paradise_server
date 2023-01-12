@@ -9,7 +9,11 @@ def comments(request, post_id):
         return Response("Post doesn't exist.", status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         # Get all the comments for the post
-        all_comments = Queries.select_spec(settings.COMMENT_TABLE, ['Post_id'], [post_id])
+        all_comments = Queries.select_spec(settings.COMMENT_TABLE, ['Post_id'], [post_id],
+                                           post_join=['game', 'user'],
+                                           on_post_join=['game.id = '])
+        query += "INNER JOIN game ON game.id = p.Game_id "
+        query += "INNER JOIN user ON user.id = p.User_id "
         serializer = CommentSerializer(all_comments, many=True)
         return Response(serializer.data)
     else:
