@@ -93,12 +93,9 @@ def where_build(where_cols):
     return query
 
 
-def select_spec(table_name, where_cols, what_to_find, spec_col=None, post_join=None, on_post_join=None):
+def select_spec(table_name, where_cols, what_to_find, spec_col=None):
     query = build_query(table_name, spec_col)
     query += where_build(where_cols)
-    for i in range(len(post_join)):
-        query += "INNER JOIN {} ON ".format(post_join[i])
-        query += "{} ".format(on_post_join[i])
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
         return cursor.fetchall()
