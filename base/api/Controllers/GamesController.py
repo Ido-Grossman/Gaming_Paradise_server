@@ -49,19 +49,21 @@ def get_games(request):
 
 
 @api_view(['GET'])
-def get_game_reviews(request, game_name):
+def get_game_reviews(request, game_id):
     """
     Handles GET requests for a list of reviews for a specific game.
     """
     # Use a raw SQL query to retrieve the requested game
-    game = Queries.select_spec(settings.GAME_TABLE, ['Name'], [game_name])[0]
+    game = Queries.select_spec(settings.GAME_TABLE, ['id'], [game_id])
 
     # If no game was found, raise a 404 error
     if not game:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    game = game[0]
+    offset = int(request.GET.get('offset', 0))
 
     # Retrieve all reviews for the game
-    game_revs = Queries.select_spec(settings.REVIEW_TABLE, ['GameName_id'], [game_name])
+    game_revs = Queries.select_spec(settings.REVIEW_TABLE, ['Game_id'], [game_id], offset=offset)
 
     # Serialize the reviews and return them in the response
     serializer = ReviewSerializer(game_revs, many=True)

@@ -37,13 +37,13 @@ def user_games(request, pk):
         # If it's get, return all the games of the user.
         # game_ids = Queries.select_spec(settings.USER_GAMES_TABLE, ['User_id'], [pk], spec_col=['Game_id'])
         game_ids = Queries.select_spec_join(settings.USER_GAMES_TABLE, settings.GAME_TABLE, 'Game_id', 'id',
-                                            ['User_id'], [pk], exclude="Game_id")
+                                            ['User_id'], [pk])
         serializer = GameNameSerializer(game_ids, many=True)
         return Response(serializer.data)
     else:
-        game_name = request.data['id']
+        game_id = request.data['Game_id']
         # Get the game object from the database
-        game = Queries.select_spec(settings.GAME_TABLE, ['Name'], [game_name])
+        game = Queries.select_spec(settings.GAME_TABLE, ['id'], [game_id])
         if not game:
             return Response("Game doesn't exist", status=status.HTTP_404_NOT_FOUND)
         columns, values = ['User_id', 'Game_id'], [user[0][0], game[0][0]]

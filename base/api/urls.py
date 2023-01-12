@@ -9,7 +9,7 @@ urlpatterns = [
     path('users/<str:user_id>/games/<str:game_id>/', UsersController.user_game),
     path('games/<str:game_id>/', GamesController.get_game),
     path('games/', GamesController.get_games),
-    path('games/<str:game_name>/reviews', GamesController.get_game_reviews),
+    path('games/<str:game_id>/reviews', GamesController.get_game_reviews),
     path('genres/', GenresController.get_genres),
     path('platforms/', PlatformController.get_platform),
     path('posts/', PostsController.create_post),
