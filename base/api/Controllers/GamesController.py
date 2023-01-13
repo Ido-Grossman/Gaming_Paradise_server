@@ -40,9 +40,9 @@ def get_games(request):
         games = Queries.select_spec(settings.GAME_TABLE, where, [game], like_cols=where, offset=offset)
         serializer = GameSerializer(games, many=True)
         return Response(serializer.data)
-    offset *= 10
+    offset *= 100
     controller = QueryController.get_instance()
-    rows = controller.get_games()[offset:offset + 10]
+    rows = controller.get_games()[offset:offset + 100]
     # Serialize the games and return them in the response
     serializer = GameSerializer(rows, many=True)
     return Response(serializer.data)

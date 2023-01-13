@@ -37,8 +37,8 @@ def build_query(table_name, columns, special=None):
 
 
 def add_offset(offset):
-    offset *= 10
-    query = "LIMIT 10 OFFSET {}".format(offset)
+    offset *= 100
+    query = "LIMIT 100 OFFSET {}".format(offset)
     return query
 
 
