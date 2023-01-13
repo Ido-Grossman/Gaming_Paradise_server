@@ -7,7 +7,7 @@ post_table = 'base_post '
 @api_view(['GET'])
 def get_user_posts(request, pk):
     # Get all the posts of the specific user and return them.
-    user_posts_query = Queries.select_spec(settings.POST_TABLE, 'User_id', pk)
+    user_posts_query = Queries.select_spec(settings.POST_TABLE, ['User_id'], [pk])
     serializer = PostSerializer(user_posts_query, many=True)
     return Response(serializer.data)
 
