@@ -110,7 +110,7 @@ def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to
     query += ".{}".format(table1_col)
     query += " = {}".format(table2)
     query += ".{}".format(table2_col)
-    if table3:
+    if table3 is not None:
         query += " INNER JOIN {}".format(table3)
         query += " ON {}".format(table1)
         query += ".{}".format(table1_col2)
