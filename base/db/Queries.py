@@ -102,13 +102,20 @@ def select_spec(table_name, where_cols, what_to_find, spec_col=None, like_cols=N
         return cursor.fetchall()
 
 
-def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None, offset=None):
+def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None, offset=None,
+                     table3=None, table3_col=None, table1_col2=None):
     query = build_query(table1, spec_col)
     query += " INNER JOIN {}".format(table2)
     query += " ON {}".format(table1)
     query += ".{}".format(table1_col)
     query += " = {}".format(table2)
     query += ".{}".format(table2_col)
+    if table3:
+        query += " INNER JOIN {}".format(table3)
+        query += " ON {}".format(table1)
+        query += ".{}".format(table1_col2)
+        query += " = {}".format(table3)
+        query += ".{}".format(table3_col)
     query += where_build(where_cols)
     if offset is not None:
         query += add_offset(offset)

@@ -7,7 +7,14 @@ post_table = 'base_post '
 @api_view(['GET'])
 def get_user_posts(request, pk):
     # Get all the posts of the specific user and return them.
-    user_posts_query = Queries.select_spec(settings.POST_TABLE, ['User_id'], [pk])
+    columns = [".id", ".TimestampCreated", ".Content", ".Title"]
+    for i in range(4):
+        columns[i] = settings.POST_TABLE + columns[i]
+    columns.append("game.Name")
+    columns.append("user.UserName")
+    user_posts_query = Queries.select_spec_join(settings.POST_TABLE, settings.GAME_TABLE, 'Game_id', "id", ["User_id"],
+                                                pk, table3=settings.USER_TABLE, table3_col='id', table1_col2="User_id",
+                                                spec_col=columns)
     serializer = PostSerializer(user_posts_query, many=True)
     return Response(serializer.data)
 
