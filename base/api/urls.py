@@ -17,7 +17,7 @@ urlpatterns = [
     path('posts/popular/game/<str:game_name>/', PostsController.popular_game_posts),
     path('posts/popular/user/<str:user_name>/', PostsController.popular_user_posts),
     path('posts/<str:pk>/', PostsController.user_post),
-    path('posts/user/<str:pk>', PostsController.get_user_posts),
+    path('posts/user/<str:pk>/', PostsController.get_user_posts),
     path('posts/<str:post_id>/likes/', LikeController.likes),
     path('posts/<str:post_id>/likes/<str:user_id>', LikeController.user_likes),
     path('posts/<str:post_id>/comment/', CommentController.comments),
