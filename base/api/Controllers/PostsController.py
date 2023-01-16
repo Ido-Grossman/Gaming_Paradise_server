@@ -73,9 +73,8 @@ def create_post(request):
 def popular_posts(request):
     # Gets the offset and day from the request.
     offset = int(request.GET.get('offset', 0))
-    day = int(request.GET.get('day', 0))
     # Gets the popular posts in the requested offset.
-    posts = Queries.select_recent(day, offset=offset)
+    posts = Queries.select_recent(offset=offset)
     # If there are no more posts, return 204 NO CONTENT
     if len(posts) == 0:
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -88,9 +87,8 @@ def popular_posts(request):
 def popular_game_posts(request, game_name):
     # Gets the offset and day from the request.
     offset = int(request.GET.get('offset', 0))
-    day = int(request.GET.get('day', 0))
     # Gets the popular posts in the requested offset, about the specific game.
-    posts = Queries.select_recent_game(day, game_name, offset=offset)
+    posts = Queries.select_recent_game(game_name, offset=offset)
     # If there are no more posts, return 204 NO CONTENT
     if len(posts) == 0:
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -105,7 +103,7 @@ def popular_user_posts(request, user_name):
     offset = int(request.GET.get('offset', 0))
     day = int(request.GET.get('day', 0))
     # Gets the popular posts in the requested offset, about the specific user games.
-    posts = Queries.select_recent_user(user_name, day, offset=offset)
+    posts = Queries.select_recent_user(user_name, offset=offset)
     # If there are no more posts, return 204 NO CONTENT
     if len(posts) == 0:
         return Response(status=status.HTTP_204_NO_CONTENT)

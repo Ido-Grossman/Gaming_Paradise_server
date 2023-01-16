@@ -172,7 +172,7 @@ def count(table_name, where_cols, what_to_find):
         return cursor.fetchone()[0]
 
 
-def popular_sort_build(day, where_cols=None, offset=None, user=None):
+def popular_sort_build(where_cols=None, offset=None, user=None):
     if where_cols is None:
         where_cols = []
     query = "SELECT p.id, p.TimestampCreated, p.Content, p.Title, game.Name, user.UserName, p.post_likes FROM "
@@ -202,23 +202,23 @@ def popular_sort_build(day, where_cols=None, offset=None, user=None):
 
 
 
-def select_recent_game(day, game, offset=None):
+def select_recent_game(game, offset=None):
     game_col = "post.Game_id"
-    query = popular_sort_build(day, where_cols=[game_col], offset=offset)
+    query = popular_sort_build(where_cols=[game_col], offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query, params={game_col: game})
         return cursor.fetchall()
 
 
-def select_recent(day, offset=None):
-    query = popular_sort_build(day, offset=offset)
+def select_recent(offset=None):
+    query = popular_sort_build(offset=offset)
     with connection.cursor() as cursor:
         cursor.execute(query)
         return cursor.fetchall()
 
 
-def select_recent_user(user_name, day, offset=None):
-    query = popular_sort_build(day, offset=offset, user=user_name)
+def select_recent_user(user_name, offset=None):
+    query = popular_sort_build(offset=offset, user=user_name)
     with connection.cursor() as cursor:
         cursor.execute(query, [user_name])
         return cursor.fetchall()
