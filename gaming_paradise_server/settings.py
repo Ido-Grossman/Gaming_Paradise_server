@@ -66,8 +66,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
 ROOT_URLCONF = 'gaming_paradise_server.urls'
 
 TEMPLATES = [
