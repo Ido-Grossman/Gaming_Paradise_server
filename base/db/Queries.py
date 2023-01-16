@@ -169,10 +169,7 @@ def count(table_name, where_cols, what_to_find):
     # Execute the query and return the first value of the result (the count)
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
-    try:
         return cursor.fetchone()[0]
-    except TypeError:
-        return 0
 
 
 def popular_sort_build(day, where_cols=None, offset=None, user=None):
