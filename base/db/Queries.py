@@ -170,7 +170,7 @@ def count(table_name, where_cols, what_to_find):
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
     try:
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
     except TypeError:
         return 0
 

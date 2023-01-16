@@ -23,8 +23,7 @@ def post_like(post_id, user_id):
 def likes(request, post_id):
     if request.method == 'GET':
         # Handles GET request for counting the number of likes on a post.
-        x = Queries.count(settings.LIKE_TABLE, ['Post_id'], [post_id])
-        return Response(x)
+        return Response(Queries.count(settings.LIKE_TABLE, ['Post_id'], [post_id]))
     else:
         # Handles POST request for like actions on a post
         return post_like(post_id, request.data['User_id'])
