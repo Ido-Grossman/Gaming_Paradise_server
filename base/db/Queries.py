@@ -104,6 +104,7 @@ def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to
     query += where_build(where_cols)
     # If offset is provided append the offset to the query
     if offset is not None:
+        #
         query += add_offset(offset)
     # Execute the query and return the result
     with connection.cursor() as cursor:
