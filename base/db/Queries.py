@@ -2,17 +2,6 @@ from django.db import connection
 
 
 def build_query(table_name, columns, special=None):
-    """
-    Build a SELECT query for a given table.
-
-    Parameters:
-        table_name (str): The name of the table to select from.
-        columns (List[str]): The list of columns to select. If None, all columns are selected.
-        special (str): An optional string to add to the SELECT clause.
-
-    Returns:
-        str: The constructed SELECT query.
-    """
     # Start building the SELECT query
     query = "SELECT "
     # If special is provided, add it to the query
@@ -37,25 +26,13 @@ def build_query(table_name, columns, special=None):
 
 
 def add_offset(offset):
+    # Multiply the offset by 100, and get the rows from offset * 100 to (offset * 100) + 100
     offset *= 100
     query = "LIMIT 100 OFFSET {}".format(offset)
     return query
 
 
 def select_all(table_name, special=None, spec_col=None, offset=None):
-    """
-    Executes a SELECT * FROM table_name query with the option to include a special clause (such as DISTINCT or LIMIT)
-    and/or select specific columns.
-
-    Parameters:
-        table_name (str): The name of the table to query.
-        special (str, optional): A special clause to include in the query (default is None).
-        spec_col (list, optional): A list of specific columns to select (default is None).
-        offset (int, optional): an offset to start from
-    Returns:
-        list: A list of tuples, where each tuple represents a row in the table.
-    """
-
     # Build the SELECT query using the provided table name and optional special clause and/or specific columns
     query = build_query(table_name, spec_col, special)
     if offset:
@@ -93,10 +70,14 @@ def where_build(where_cols, like_cols=None):
 
 
 def select_spec(table_name, where_cols, what_to_find, spec_col=None, like_cols=None, offset=None):
+    # Build the SELECT query using the provided table name and specific columns
     query = build_query(table_name, spec_col)
+    # Append the WHERE clause to the SELECT query using the provided where_cols
     query += where_build(where_cols, like_cols=like_cols)
+    # If offset is provided append the offset to the query
     if offset is not None:
         query += add_offset(offset)
+    # Execute the query and return the result
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
         return cursor.fetchall()
@@ -104,70 +85,91 @@ def select_spec(table_name, where_cols, what_to_find, spec_col=None, like_cols=N
 
 def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to_find, spec_col=None, offset=None,
                      table3=None, table3_col=None, table1_col2=None):
+    # Build the SELECT query using the provided table name and specific columns
     query = build_query(table1, spec_col)
+    # Append the INNER JOIN clause to the SELECT query using the provided table2 and join conditions
     query += " INNER JOIN {}".format(table2)
     query += " ON {}".format(table1)
     query += ".{}".format(table1_col)
     query += " = {}".format(table2)
     query += ".{}".format(table2_col)
+    # If table3 and join conditions are provided, append the additional join to the query
     if table3 is not None:
         query += " INNER JOIN {}".format(table3)
         query += " ON {}".format(table1)
         query += ".{}".format(table1_col2)
         query += " = {}".format(table3)
         query += ".{}".format(table3_col)
+    # Append the WHERE clause to the SELECT query using the provided where_cols
     query += where_build(where_cols)
+    # If offset is provided append the offset to the query
     if offset is not None:
         query += add_offset(offset)
+    # Execute the query and return the result
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
         return cursor.fetchall()
 
 
 def insert(table_name, columns, values):
+    # Build the INSERT INTO query using the provided table name and column names
     query = "INSERT INTO {} ".format(table_name)
     query += "("
     timestamp = False
     for column in columns:
         query += "{}, ".format(column)
+        # Check if the 'TimestampCreated' column is present and set timestamp flag to true
         if column == "TimestampCreated":
             timestamp = True
-    query = query[:-2]
-    query += ") VALUES ("
-    for value in values:
-        query += "%s, "
-    if timestamp:
-        query += "{}, ".format("NOW()")
-    query = query[:-2]
-    query += ")"
+        query = query[:-2]
+        query += ") VALUES ("
+        # Add placeholders for the values
+        for value in values:
+            query += "%s, "
+        # if timestamp flag is true, add 'NOW()' to the query
+        if timestamp:
+            query += "{}, ".format("NOW()")
+        query = query[:-2]
+        query += ")"
+    # Execute the query with the provided values
     with connection.cursor() as cursor:
         cursor.execute(query, values)
 
 
 def update(table_name, set_cols, updated_val, where_cols, what_to_find):
+    # Build the UPDATE query using the provided table name and SET clause
     query = "UPDATE {} SET".format(table_name)
     for col in set_cols:
         query += " {} = %s,".format(col)
     query = query[:-1]
+    # Append the WHERE clause to the UPDATE query using the provided where_cols
     query += where_build(where_cols)
+    # Combine the updated values and what_to_find values for the execute statement
     updated_val += what_to_find
+    # Execute the query with the provided values
     with connection.cursor() as cursor:
         cursor.execute(query, updated_val)
 
 
 def delete(table_name, where_cols, what_to_find):
+    # Build the DELETE query using the provided table name
     query = "DELETE FROM {}".format(table_name)
+    # Append the WHERE clause to the DELETE query using the provided where_cols
     query += where_build(where_cols)
+    # Execute the query with the provided values
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
 
 
 def count(table_name, where_cols, what_to_find):
+    # Build the SELECT COUNT() query using the provided table name
     query = "SELECT Count(*) FROM {}".format(table_name)
+    # Append the WHERE clause to the SELECT query using the provided where_cols
     query += where_build(where_cols)
+    # Execute the query and return the first value of the result (the count)
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
-        return cursor.fetchone()[0]
+    return cursor.fetchone()[0]
 
 
 def popular_sort_build(day, where_cols=None, offset=None, user=None):
@@ -176,13 +178,15 @@ def popular_sort_build(day, where_cols=None, offset=None, user=None):
     query = "SELECT p.id, p.TimestampCreated, p.Content, p.Title, game.Name, user.UserName, p.post_likes FROM "
     query += "(SELECT post.*, COUNT(likes.id) AS post_likes "
     query += "FROM post "
+    # Add a JOIN clause to filter the posts by the user's games
     if user:
         query += "INNER JOIN usergames ug ON ug.Game_id = post.Game_id AND ug.User_id = %s "
     query += "LEFT JOIN likes ON likes.Post_id = post.Id "
-    query += "WHERE post.TimestampCreated >= NOW() "
-    query += "- INTERVAL {} DAY ".format(day + 1)
-    query += "AND post.TimestampCreated < NOW() "
-    query += "- INTERVAL {} DAY ".format(day)
+    # Tried to send by days, but disabled for the moment, left here in case we fix the bug.
+    # query += "WHERE post.TimestampCreated >= NOW() "
+    # query += "- INTERVAL {} DAY ".format(day + 1)
+    # query += "AND post.TimestampCreated < NOW() "
+    # query += "- INTERVAL {} DAY ".format(day)
     for col in where_cols:
         query += "AND {}".format(col)
         query += " = %({}".format(col)

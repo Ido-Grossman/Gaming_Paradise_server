@@ -7,8 +7,10 @@ def login(request):
     username, password = request.data['UserName'], request.data['Password']
     # Check if the user exists and if the password is correct
     user = Queries.select_spec(settings.USER_TABLE, ['UserName', 'Password'], [username, password])
+    # If one of the parameters is wrong, return 404 not found
     if not user:
         return Response("User doesn't exist or password is wrong", status=status.HTTP_404_NOT_FOUND)
+    # Else, return the id of the user.
     user_id = str(user[0][0])
     return Response(user_id)
 
@@ -17,13 +19,11 @@ def login(request):
 def register(request):
     # Creating the user object out of the json data and makes sure it is valid.
     username, password = request.data['UserName'], request.data['Password']
-
+    # If the user already exists, return 404 NOT FOUND
     if Queries.select_spec(settings.USER_TABLE, ['UserName'], [username]):
         return Response('User exists', status=status.HTTP_404_NOT_FOUND)
-
     # If the user doesn't exist, insert a new row into the base_user table
     Queries.insert(settings.USER_TABLE, ['UserName', 'Password'], [username, password])
-
     return Response(status=status.HTTP_201_CREATED)
 
 
@@ -53,13 +53,15 @@ def user_games(request, pk):
         else:
             # Subscribe the user to this game
             Queries.insert(settings.USER_GAMES_TABLE, columns, values)
-
         return Response()
 
 
 @api_view(['GET'])
 def user_game(request, user_id, game_id):
+    # Gets a specific game from the usergames of the user id.
     row = Queries.select_spec(settings.USER_GAMES_TABLE, ['User_id', 'Game_id'], [user_id, game_id])
+    # If the user didn't subscribe to the game, return 404 NOT FOUND.
     if not row:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    # If the user subscribed to the game, return 200.
     return Response(status=status.HTTP_200_OK)
