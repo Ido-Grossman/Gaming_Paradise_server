@@ -128,6 +128,8 @@ def insert(table_name, columns, values):
         query += "{}, ".format("NOW()")
     query = query[:-2]
     query += ")"
+    with connection.cursor() as cursor:
+        cursor.execute(query, values)
 
 
 def update(table_name, set_cols, updated_val, where_cols, what_to_find):
