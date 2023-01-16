@@ -1,20 +1,22 @@
 from .imports import *
 
 def post_like(post_id, user_id):
-    # check if user exists
+    # Check if the user exists
     if not Queries.select_spec(settings.USER_TABLE, ['id'], [user_id]):
+        # If the user doesn't exist, return 404 not found
         return Response("User doesn't exist.", status=status.HTTP_404_NOT_FOUND)
 
-    # check if post exists
+    # Check if the post exists
     if not Queries.select_spec(settings.POST_TABLE, ['id'], [post_id]):
+        # If the post doesn't exist, return 404 not found
         return Response("Object doesn't exist.", status=status.HTTP_404_NOT_FOUND)
 
-    # check if the user has already liked the post
+    # Check if the like already exists
     if Queries.select_spec(settings.LIKE_TABLE, ['User_id', 'Post_id'], [user_id, post_id]):
-        # if they have, delete the like
+        # If the like already exists, delete it
         Queries.delete(settings.LIKE_TABLE, ['User_id', 'Post_id'], [user_id, post_id])
     else:
-        # if they haven't, insert a new like
+        # If the like doesn't exist, insert it
         Queries.insert(settings.LIKE_TABLE, ['User_id', 'Post_id'], [user_id, post_id])
     return Response()
 

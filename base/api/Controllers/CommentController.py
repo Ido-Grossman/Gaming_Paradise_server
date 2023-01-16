@@ -40,9 +40,6 @@ def comments(request, post_id):
 
 @api_view(['GET'])
 def comment_amounts(request, post_id):
-    # Retrieve the number of comments for the specified post
-    comment_count = Queries.count(settings.COMMENT_TABLE, ['Post_id'], [post_id])
-
     # Return the comment count along with some context about the post
-    return Response({'post_id': post_id, 'comment_count': comment_count})
+    return Response(Queries.count(settings.COMMENT_TABLE, ['Post_id'], [post_id]))
 
