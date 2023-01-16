@@ -113,28 +113,21 @@ def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to
 
 
 def insert(table_name, columns, values):
-    # Build the INSERT INTO query using the provided table name and column names
     query = "INSERT INTO {} ".format(table_name)
     query += "("
     timestamp = False
     for column in columns:
         query += "{}, ".format(column)
-        # Check if the 'TimestampCreated' column is present and set timestamp flag to true
         if column == "TimestampCreated":
             timestamp = True
-        query = query[:-2]
-        query += ") VALUES ("
-        # Add placeholders for the values
-        for value in values:
-            query += "%s, "
-        # if timestamp flag is true, add 'NOW()' to the query
-        if timestamp:
-            query += "{}, ".format("NOW()")
-        query = query[:-2]
-        query += ")"
-    # Execute the query with the provided values
-    with connection.cursor() as cursor:
-        cursor.execute(query, values)
+    query = query[:-2]
+    query += ") VALUES ("
+    for value in values:
+        query += "%s, "
+    if timestamp:
+        query += "{}, ".format("NOW()")
+    query = query[:-2]
+    query += ")"
 
 
 def update(table_name, set_cols, updated_val, where_cols, what_to_find):

@@ -4,28 +4,23 @@ from .imports import *
 
 @api_view(['GET'])
 def get_game(request, game_id):
-    game_col = 'id' # column name for the game id
-    genres, platforms = [], [] # empty lists to store the game's genres and platforms
-    # get all genres for the game using a custom function, Queries.select_spec_join,
-    # which performs a JOIN on the genre and game table and filters by the game id
+    game_col = 'id'
+    genres, platforms = [], []
+    # Use a raw SQL query to retrieve the requested game
     game_genres = Queries.select_spec_join(settings.GENRE_TABLE, settings.GAME_TABLE, 'Game_id',
                                            'id', [settings.GAME_TABLE + "." + game_col], [game_id])
+    # If no game was found, raise a 404 error
     for game_genre in game_genres:
-        # add each genre to the genres list
         genres.append(game_genre[8])
-    # get all platforms for the game using a custom function, Queries.select_spec_join,
-    # which performs a JOIN on the platform and game table and filters by the game id
     game_platforms = Queries.select_spec_join(settings.GAME_TABLE, settings.PLATFORM_TABLE, game_col, 'Game_id'
                                               , [settings.GAME_TABLE + "." + game_col], [game_id])
     for game_platform in game_platforms:
-        # add each platform to the platforms list
         platforms.append(game_platform[8])
     game_details = game_platforms[0]
-    # create a tuple for the game containing all the details and the genres and platforms lists
     game = (game_details[0], game_details[1], game_details[2], game_details[3], game_details[4], game_details[5]
             , game_details[6], game_details[7], genres, platforms)
+    # Otherwise, serialize the game and return it in the response
     serializer = GameFullSerializer(game)
-    # use the serializer to convert the game data to json format
     return Response(serializer.data)
 
 
