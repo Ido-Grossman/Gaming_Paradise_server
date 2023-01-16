@@ -23,19 +23,16 @@ def post_like(post_id, user_id):
 
 @api_view(['POST', 'GET'])
 def likes(request, post_id):
+    # Going to the right function depending on the method.
     if request.method == 'GET':
-        # Handles GET request for counting the number of likes on a post.
         return Response(Queries.count(settings.LIKE_TABLE, ['Post_id'], [post_id]))
     else:
-        # Handles POST request for like actions on a post
         return post_like(post_id, request.data['User_id'])
 
 
 @api_view(['GET'])
 def user_likes(request, post_id, user_id):
-    # check if the user has liked the post
     if Queries.select_spec(settings.LIKE_TABLE, ['User_id', 'Post_id'], [user_id, post_id]):
         return Response()
     else:
-        # if they haven't, return a 404 not found response
         return Response(status=status.HTTP_404_NOT_FOUND)
