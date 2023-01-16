@@ -118,6 +118,7 @@ def select_spec_join(table1, table2, table1_col, table2_col, where_cols, what_to
         query += ".{}".format(table3_col)
     query += where_build(where_cols)
     if offset is not None:
+        #
         query += add_offset(offset)
     with connection.cursor() as cursor:
         cursor.execute(query, what_to_find)
