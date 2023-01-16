@@ -8,8 +8,6 @@ def create_review(request):
     user_name, game_name, rev = review['UserName'], review['GameName'], review['Review']
 
     # Check if the game exists
-
-    x = settings.GAME_TABLE
     if not Queries.select_spec(settings.GAME_TABLE, ['Name'], [game_name]):
         # If the game doesn't exist it returns 404 not found
         return Response("Game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
@@ -17,7 +15,6 @@ def create_review(request):
     # Create the review
     columns, values = ['UserName', 'GameName_id', 'Review', 'TimestampCreated'], [user_name, game_name, rev]
     Queries.insert(settings.REVIEW_TABLE, columns, values)
-
     return Response()
 
 @api_view(['GET', 'PUT', 'DELETE'])

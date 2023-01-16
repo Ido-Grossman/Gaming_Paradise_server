@@ -25,8 +25,9 @@ SECRET_KEY = 'django-insecure-dp0wr$ane(1wtxs=vn&v4h0jn$-w-8=9t_do%7bvb0s@(w-vxh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
+# The names of all the tables.
 POST_TABLE = 'post'
 GAME_TABLE = 'game'
 USER_TABLE = 'user'
@@ -91,6 +92,7 @@ WSGI_APPLICATION = 'gaming_paradise_server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# Connecting to the database and sets a connection pool of 7 connections
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
