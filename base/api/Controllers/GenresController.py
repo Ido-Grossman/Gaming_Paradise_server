@@ -12,6 +12,8 @@ def get_genres(request):
         # which performs a JOIN on the genre and game table and filters by the genre name
         rows = Queries.select_spec_join(settings.GENRE_TABLE, settings.GAME_TABLE, 'Game_id', 'id', ['Genre'],
                                         [genre], spec_col=['game.*'], offset=offset)
+        serializer = GameSerializer(rows, many=True)
+        return Response(serializer.data)
     # Else, we return a list of all the genres.
     controller = QueryController.get_instance()
     genres = controller.get_genres()

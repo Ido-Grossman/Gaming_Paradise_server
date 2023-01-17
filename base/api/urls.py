@@ -22,6 +22,5 @@ urlpatterns = [
     path('posts/<str:post_id>/likes/<str:user_id>/', LikeController.user_likes),
     path('posts/<str:post_id>/comment/', CommentController.comments),
     path('posts/<str:post_id>/comment/amount/', CommentController.comment_amounts),
-    path('reviews/', ReviewsController.create_review),
     path('reviews/<str:rev_id>/', ReviewsController.specific_review),
 ]
