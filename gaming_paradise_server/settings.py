@@ -96,11 +96,11 @@ WSGI_APPLICATION = 'gaming_paradise_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gaming_paradise',
-        'USER': 'root',
-        'PASSWORD': 'SantIdOfek',
-        'HOST':'127.0.0.1',
-        'PORT':'3306',
+        'NAME': 'db_13',
+        'USER': 'team_13',
+        'PASSWORD': '0013',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
         'POOL_SIZE': 7
     }
 }
