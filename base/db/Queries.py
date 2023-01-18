@@ -35,7 +35,8 @@ def add_offset(offset):
 def select_all(table_name, special=None, spec_col=None, offset=None):
     # Build the SELECT query using the provided table name and optional special clause and/or specific columns
     query = build_query(table_name, spec_col, special)
-    if offset:
+    if offset is not None:
+        query += " "
         query += add_offset(offset)
     # Execute the query
     with connection.cursor() as cursor:

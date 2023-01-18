@@ -14,6 +14,6 @@ def get_platform(request):
         serializer = GameSerializer(game_ids, many=True)
         return Response(serializer.data)
     # If no platform is requested, it returns all the distinct platforms.
-    controller = QueryController.get_instance()
-    platforms = controller.get_platforms()
+    rows = Queries.select_all(settings.PLATFORM_TABLE, special='DISTINCT', spec_col=['Platform'])
+    platforms = {"Platform": [row[0] for row in rows]}
     return Response(platforms)

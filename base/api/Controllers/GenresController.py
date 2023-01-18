@@ -15,6 +15,6 @@ def get_genres(request):
         serializer = GameSerializer(rows, many=True)
         return Response(serializer.data)
     # Else, we return a list of all the genres.
-    controller = QueryController.get_instance()
-    genres = controller.get_genres()
+    rows = Queries.select_all(settings.GENRE_TABLE, special='DISTINCT', spec_col=['Genre'])
+    genres = {"Genre": [row[0] for row in rows]}
     return Response(genres)

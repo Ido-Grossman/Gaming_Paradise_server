@@ -6,10 +6,12 @@ from .imports import *
 def get_game(request, game_id):
     game_col = 'id'
     genres, platforms = [], []
+    # If no game was found, raise a 404 error
+    if not Queries.select_spec(settings.GAME_TABLE, [game_col], [game_id]):
+        return Response(status=status.HTTP_404_NOT_FOUND)
     # Use a raw SQL query to retrieve the requested game
     game_genres = Queries.select_spec_join(settings.GAME_TABLE, settings.GENRE_TABLE, game_col, 'Game_id',
                                            [settings.GAME_TABLE + "." + game_col], [game_id])
-    # If no game was found, raise a 404 error
     for game_genre in game_genres:
         genres.append(game_genre[9])
     game_platforms = Queries.select_spec_join(settings.GAME_TABLE, settings.PLATFORM_TABLE, game_col, 'Game_id'
@@ -38,9 +40,8 @@ def get_games(request):
         serializer = GameSerializer(games, many=True)
         return Response(serializer.data)
     # If no game was sent, we retrieve all the game in offsets of 100.
-    offset *= 100
     controller = QueryController.get_instance()
-    rows = controller.get_games()[offset:offset + 100]
+    rows = Queries.select_all(settings.GAME_TABLE, offset=offset)
     # Serialize the games and return them in the response
     serializer = GameSerializer(rows, many=True)
     return Response(serializer.data)
