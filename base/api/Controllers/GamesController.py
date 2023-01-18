@@ -7,15 +7,15 @@ def get_game(request, game_id):
     game_col = 'id'
     genres, platforms = [], []
     # Use a raw SQL query to retrieve the requested game
-    game_genres = Queries.select_spec_join(settings.GENRE_TABLE, settings.GAME_TABLE, 'Game_id',
-                                           'id', [settings.GAME_TABLE + "." + game_col], [game_id])
+    game_genres = Queries.select_spec_join(settings.GAME_TABLE, settings.GENRE_TABLE, game_col, 'Game_id',
+                                           [settings.GAME_TABLE + "." + game_col], [game_id])
     # If no game was found, raise a 404 error
     for game_genre in game_genres:
-        genres.append(game_genre[8])
+        genres.append(game_genre[9])
     game_platforms = Queries.select_spec_join(settings.GAME_TABLE, settings.PLATFORM_TABLE, game_col, 'Game_id'
                                               , [settings.GAME_TABLE + "." + game_col], [game_id])
     for game_platform in game_platforms:
-        platforms.append(game_platform[8])
+        platforms.append(game_platform[9])
     game_details = game_platforms[0]
     game = (game_details[0], game_details[1], game_details[2], game_details[3], game_details[4], game_details[5]
             , game_details[6], game_details[7], genres, platforms)
